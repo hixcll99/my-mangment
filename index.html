@@ -38,7 +38,7 @@
   }
   .mono{font-family:'IBM Plex Mono',monospace;}
   #app{min-height:100vh;display:flex;flex-direction:column;}
-
+ 
   /* ---------- Gate screen ---------- */
   .gate{
     min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -75,7 +75,7 @@
   }
   .pin-box button{margin-top:10px;width:100%;padding:12px;border:none;border-radius:4px;background:var(--spool);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;}
   .pin-err{color:var(--red);font-size:12px;margin-top:8px;display:none;}
-
+ 
   /* ---------- Shell ---------- */
   .shell{display:flex;min-height:100vh;}
   nav.side{
@@ -92,18 +92,18 @@
   nav.side button.active{background:var(--amber);color:#221800;font-weight:700;}
   nav.side button:hover:not(.active){background:rgba(255,255,255,.08);}
   nav.side .exit{margin-top:auto;color:#B9C0C9;font-size:12px;padding:10px 12px;cursor:pointer;}
-
+ 
   main{flex:1;padding:28px 34px;max-width:1180px;}
   .topline{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px;}
   .topline h2{font-size:22px;margin:0;font-weight:900;}
   .topline .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber-deep);text-transform:uppercase;letter-spacing:1px;}
-
+ 
   .grid{display:grid;gap:16px;}
   .g4{grid-template-columns:repeat(4,1fr);}
   .g3{grid-template-columns:repeat(3,1fr);}
   .g2{grid-template-columns:repeat(2,1fr);}
   @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:1fr;} .g2{grid-template-columns:1fr;}}
-
+ 
   /* ---------- Mobile ---------- */
   @media(max-width:680px){
     .shell{flex-direction:column;min-height:auto;}
@@ -135,15 +135,15 @@
     .g4{grid-template-columns:1fr;}
     .tags-grid{grid-template-columns:1fr;}
   }
-
+ 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 20px;}
   .stat{padding:18px 20px;}
   .stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
   .stat .num{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;}
   .stat .sub{font-size:11px;color:var(--ink-soft);margin-top:4px;}
-
+ 
   h3.section{font-size:14px;margin:26px 0 10px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
-
+ 
   table{width:100%;border-collapse:collapse;font-size:13.5px;}
   th{text-align:right;color:var(--ink-soft);font-weight:600;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line);}
   td{padding:9px 10px;border-bottom:1px solid var(--line);}
@@ -153,7 +153,7 @@
   .tag.use{background:var(--warn-soft);color:var(--warn);}
   .tag.done{background:#EFEFEF;color:#7A7F86;}
   .tag.alert{background:var(--red-soft);color:var(--red);}
-
+ 
   .btn{padding:9px 16px;border-radius:4px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);}
   .btn.primary{background:var(--spool);color:#fff;border-color:var(--spool);}
   .btn.amber{background:var(--amber);color:#221800;border-color:var(--amber);}
@@ -162,10 +162,10 @@
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
   label.field{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
   input,select{padding:9px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;width:100%;}
-
+ 
   .bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px;}
   .bar > div{height:100%;background:var(--amber);}
-
+ 
   /* QR print tags */
   .tags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;direction:ltr;}
   .tag-card{
@@ -183,7 +183,7 @@
   .tag-card .tlabel{display:block;font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:2px;}
   .tag-card .tval{display:block;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;}
   .tag-card .tid{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#666;border-top:1px solid #111;padding:5px 4px;letter-spacing:.5px;}
-
+ 
   /* Worker scan view */
   .scan-wrap{max-width:480px;margin:0 auto;}
   #video-box{position:relative;border-radius:6px;overflow:hidden;background:#000;aspect-ratio:1/1;}
@@ -191,7 +191,7 @@
   .scan-frame{position:absolute;inset:14%;border:3px solid var(--amber);border-radius:8px;pointer-events:none;}
   .scan-result{margin-top:16px;padding:16px;border-radius:4px;border:1px solid var(--line);background:var(--panel);}
   .empty{color:var(--ink-soft);font-size:13px;padding:20px 0;text-align:center;}
-
+ 
   .no-print{}
   @media print{
     @page{ size:A4; margin:12mm; }
@@ -207,7 +207,7 @@
 </head>
 <body>
 <div id="app"></div>
-
+ 
 <script>
 /* ============ FIREBASE SETUP ============ */
 // 1) Create a free project at https://console.firebase.google.com
@@ -226,7 +226,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const COLLECTION = 'tarkiba_inventory';
-
+ 
 async function ensureAuth(){
   return new Promise((resolve)=>{
     firebase.auth().onAuthStateChanged(user=>{
@@ -235,11 +235,11 @@ async function ensureAuth(){
     });
   });
 }
-
+ 
 /* ============ STORAGE HELPERS (Firestore-backed) ============ */
 const KEYS = { sizes:'sizes', rolls:'rolls', settings:'settings' };
 const DEFAULT_SETTINGS = { commDays:2, mfgDays:10, seaDays:20, localDays:4, safety:1.25, pin:'1234' };
-
+ 
 async function storeGet(key, fallback){
   try{
     const snap = await db.collection(COLLECTION).doc(key).get();
@@ -250,9 +250,9 @@ async function storeSet(key, value){
   try{ await db.collection(COLLECTION).doc(key).set({ value, updatedAt: Date.now() }); }
   catch(e){ console.error('storage set failed', e); alert('تعذّر الحفظ — تأكد من اتصال الإنترنت وإعدادات Firebase'); }
 }
-
+ 
 let STATE = { sizes:[], rolls:[], settings:DEFAULT_SETTINGS, role:null, tab:'dashboard' };
-
+ 
 async function loadAll(){
   await ensureAuth();
   const [sizes, rolls, settings] = await Promise.all([
@@ -264,7 +264,7 @@ async function loadAll(){
   STATE.rolls = rolls;
   STATE.settings = settings;
 }
-
+ 
 /* ============ HELPERS ============ */
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function fmt(n){ return new Intl.NumberFormat('en-US').format(Math.round(n*10)/10); }
@@ -272,13 +272,13 @@ function daysBetween(a,b){ return Math.max(0, Math.round((b-a)/86400000)); }
 function sizeById(id){ return STATE.sizes.find(s=>s.id===id); }
 function sizeLabel(s){ return `${s.widthCm} سم × ${s.lengthM} م`; }
 function makeSizeCode(widthCm,lengthM){ return `W${widthCm}L${lengthM}`; }
-
+ 
 function rollsForSize(sizeId, status){
   return STATE.rolls.filter(r=>r.sizeId===sizeId && (!status || r.status===status));
 }
 function countStock(sizeId){ return rollsForSize(sizeId,'in_stock').length; }
 function countUse(sizeId){ return rollsForSize(sizeId,'in_use').length; }
-
+ 
 function dailyConsumptionMeters(sizeId, windowDays){
   const cutoff = Date.now() - windowDays*86400000;
   const finished = STATE.rolls.filter(r=>r.sizeId===sizeId && r.status==='finished' && r.finishedAt>=cutoff);
@@ -287,12 +287,12 @@ function dailyConsumptionMeters(sizeId, windowDays){
   const meters = finished.length * size.lengthM;
   return meters / windowDays;
 }
-
+ 
 function leadTimeTotalDays(){
   const s = STATE.settings;
   return (Number(s.commDays)||0)+(Number(s.mfgDays)||0)+(Number(s.seaDays)||0)+(Number(s.localDays)||0);
 }
-
+ 
 function reorderInfo(sizeId){
   const size = sizeById(sizeId);
   const rate = dailyConsumptionMeters(sizeId, 30); // meters/day, last 30d
@@ -304,13 +304,13 @@ function reorderInfo(sizeId){
   const suggestedRolls = size.lengthM>0 ? Math.ceil(reorderPointMeters/size.lengthM) : 0;
   return { rate, reorderPointMeters, stockMeters, needsReorder, suggestedRolls };
 }
-
+ 
 /* ============ RENDER ROOT ============ */
 async function boot(){
   await loadAll();
   render();
 }
-
+ 
 function render(){
   const app = document.getElementById('app');
   if(!STATE.role){ app.innerHTML = gateHTML(); attachGateEvents(); return; }
@@ -318,7 +318,7 @@ function render(){
   attachShellEvents();
   renderTab();
 }
-
+ 
 /* ============ GATE ============ */
 function gateHTML(){
   return `
@@ -357,7 +357,7 @@ function checkPin(){
     document.getElementById('pin-err').style.display='block';
   }
 }
-
+ 
 /* ============ SHELL ============ */
 const OWNER_TABS = [
   ['dashboard','لوحة التحكم'],
@@ -385,7 +385,7 @@ function attachShellEvents(){
   });
   document.getElementById('exit-btn').onclick = ()=>{ STATE.role=null; render(); };
 }
-
+ 
 function renderTab(){
   const el = document.getElementById('main-area');
   if(STATE.tab==='dashboard') el.innerHTML = dashboardHTML();
@@ -396,7 +396,7 @@ function renderTab(){
   else if(STATE.tab==='scan') el.innerHTML = scanHTML();
   attachTabEvents();
 }
-
+ 
 /* ============ DASHBOARD ============ */
 function dashboardHTML(){
   const totalStockRolls = STATE.rolls.filter(r=>r.status==='in_stock').length;
@@ -404,9 +404,9 @@ function dashboardHTML(){
   const totalInUse = STATE.rolls.filter(r=>r.status==='in_use').length;
   const finished30 = STATE.rolls.filter(r=>r.status==='finished' && r.finishedAt >= Date.now()-30*86400000);
   const consumedMeters30 = finished30.reduce((sum,r)=>{ const s=sizeById(r.sizeId); return sum + (s?s.lengthM:0); },0);
-
+ 
   const alerts = STATE.sizes.map(s=>({s, info:reorderInfo(s.id)})).filter(x=>x.info.needsReorder);
-
+ 
   const rowsBySize = STATE.sizes.map(s=>{
     const info = reorderInfo(s.id);
     const finishedThisSize30 = rollsForSize(s.id,'finished').filter(r=>r.finishedAt>=Date.now()-30*86400000).length;
@@ -419,7 +419,7 @@ function dashboardHTML(){
       <td>${info.needsReorder ? `<span class="tag alert">أعد الطلب — ${info.suggestedRolls} رولة</span>` : `<span class="tag stock">مخزون كافٍ</span>`}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="6" class="empty">لا توجد قياسات مضافة بعد — أضفها من تبويب "المخزون والقياسات"</td></tr>`;
-
+ 
   return `
     <div class="topline"><div><div class="eyebrow">نظرة عامة</div><h2>لوحة التحكم</h2></div></div>
     <div class="grid g4">
@@ -431,7 +431,7 @@ function dashboardHTML(){
     <div class="grid g4" style="margin-top:16px">
       <div class="card stat"><div class="label">تنبيهات إعادة طلب</div><div class="num" style="color:${alerts.length?'var(--red)':'var(--teal)'}">${alerts.length}</div><div class="sub">حسب مدة التوريد المحددة</div></div>
     </div>
-
+ 
     ${alerts.length ? `
     <h3 class="section">تنبيهات نقص المخزون</h3>
     <div class="grid g3">
@@ -441,7 +441,7 @@ function dashboardHTML(){
           <div style="font-size:12.5px;color:var(--ink-soft);margin-top:4px">المخزون الحالي ${fmt(a.info.stockMeters)} م، والمطلوب طلب ${a.info.suggestedRolls} رولة تقريباً بناءً على معدل الصرف ومدة التوريد (${leadTimeTotalDays()} يوم)</div>
         </div>`).join('')}
     </div>` : ''}
-
+ 
     <h3 class="section">المخزون حسب القياس</h3>
     <div class="card">
       <table>
@@ -451,7 +451,7 @@ function dashboardHTML(){
     </div>
   `;
 }
-
+ 
 /* ============ INVENTORY (sizes + receive rolls + print QR) ============ */
 function inventoryHTML(){
   const sizeRows = STATE.sizes.map(s=>`
@@ -466,11 +466,11 @@ function inventoryHTML(){
         <button class="btn ghost" data-delete-size="${s.id}" style="color:var(--red);border-color:var(--red-soft)">حذف</button>
       </td>
     </tr>`).join('') || `<tr><td colspan="6" class="empty">لا توجد قياسات بعد</td></tr>`;
-
+ 
   return `
     <div class="no-print">
       <div class="topline"><div><div class="eyebrow">إدارة</div><h2>المخزون والقياسات</h2></div></div>
-
+ 
       <div class="card">
         <div class="row">
           <div style="flex:1"><label class="field">عرض الرولة (سم)</label><input id="new-width" type="number" placeholder="مثال: 50"></div>
@@ -478,7 +478,7 @@ function inventoryHTML(){
           <div><button class="btn primary" id="add-size-btn" style="margin-top:19px">+ إضافة قياس جديد</button></div>
         </div>
       </div>
-
+ 
       <h3 class="section">القياسات المسجلة</h3>
       <div class="card">
         <table>
@@ -486,7 +486,7 @@ function inventoryHTML(){
           ${sizeRows}
         </table>
       </div>
-
+ 
       <h3 class="section">سجل الاستلام</h3>
       <div class="card">
         <table>
@@ -494,14 +494,14 @@ function inventoryHTML(){
           ${receivingLogRows()}
         </table>
       </div>
-
+ 
       <div id="receive-modal"></div>
     </div>
-
+ 
     <div id="qr-print-zone"></div>
   `;
 }
-
+ 
 function receivingLogRows(){
   // group rolls by (sizeId, receivedAt) — every roll of the same shipment shares the same receivedAt
   const groups = {};
@@ -530,7 +530,7 @@ function receivingLogRows(){
     </tr>`;
   }).join('');
 }
-
+ 
 function receiveModalHTML(sizeId){
   const s = sizeById(sizeId);
   return `
@@ -545,15 +545,15 @@ function receiveModalHTML(sizeId){
     </div>
   </div>`;
 }
-
+ 
 function generateQrTags(sizeId, roObjs){
   const s = sizeById(sizeId);
   const batchTotal = roObjs.length;
   const zone = document.getElementById('qr-print-zone');
-
+ 
   // one tag per roll (no duplicate copies)
   const printList = roObjs.map(r=>({ r, c:0 }));
-
+ 
   zone.innerHTML = `
     <h3 class="section no-print">QR Tags — print and attach to each roll</h3>
     <div class="row no-print" style="margin-bottom:10px"><button class="btn primary" id="print-tags-btn">🖶 Print / Save as PDF</button></div>
@@ -574,7 +574,7 @@ function generateQrTags(sizeId, roObjs){
   });
   document.getElementById('print-tags-btn').onclick = ()=> window.print();
 }
-
+ 
 /* ============ ACTIVE ROLLS ============ */
 function activeHTML(){
   const active = STATE.rolls.filter(r=>r.status==='in_use').sort((a,b)=>a.startedAt-b.startedAt);
@@ -590,7 +590,7 @@ function activeHTML(){
       <td><span class="tag use">شغالة</span></td>
     </tr>`;
   }).join('') || `<tr><td colspan="6" class="empty">لا توجد رولات شغالة حالياً على الستاند</td></tr>`;
-
+ 
   return `
     <div class="topline"><div><div class="eyebrow">الستاند</div><h2>الرولات الشغالة الآن</h2></div></div>
     <div class="card">
@@ -598,7 +598,7 @@ function activeHTML(){
     </div>
   `;
 }
-
+ 
 /* ============ REPORTS ============ */
 function reportsHTML(){
   return `
@@ -623,7 +623,7 @@ function renderReportBody(days){
     bySize[r.sizeId].push(r);
   });
   const totalMeters = finished.reduce((sum,r)=>{ const s=sizeById(r.sizeId); return sum+(s?s.lengthM:0); },0);
-
+ 
   const rows = Object.keys(bySize).map(sizeId=>{
     const s = sizeById(sizeId);
     const list = bySize[sizeId];
@@ -631,7 +631,7 @@ function renderReportBody(days){
     const avgDays = Math.round(list.reduce((sum,r)=>sum+daysBetween(r.startedAt||r.finishedAt, r.finishedAt),0)/list.length);
     return `<tr><td>${sizeLabel(s)}</td><td>${list.length} رولة</td><td>${fmt(meters)} م</td><td>${avgDays} يوم</td></tr>`;
   }).join('') || `<tr><td colspan="4" class="empty">لا يوجد صرف مسجل خلال هذه الفترة</td></tr>`;
-
+ 
   document.getElementById('report-body').innerHTML = `
     <div class="card" style="margin-bottom:16px">
       <div style="font-weight:900;font-size:16px">تقرير الصرف — ${days==7?'آخر 7 أيام':'آخر 30 يوم'}</div>
@@ -647,7 +647,7 @@ function renderReportBody(days){
     </div>
   `;
 }
-
+ 
 /* ============ SETTINGS ============ */
 function settingsHTML(){
   const s = STATE.settings;
@@ -664,7 +664,7 @@ function settingsHTML(){
       <div style="margin-top:14px;color:var(--ink-soft);font-size:12.5px">إجمالي مدة التوريد الحالية: <b class="mono" style="color:var(--ink)">${leadTimeTotalDays()} يوم</b></div>
       <div class="row" style="margin-top:16px"><button class="btn primary" id="save-settings">حفظ الإعدادات</button></div>
     </div>
-
+ 
     <h3 class="section">الرمز السري لدخول المالك</h3>
     <div class="card">
       <div class="row">
@@ -674,14 +674,15 @@ function settingsHTML(){
     </div>
   `;
 }
-
+ 
 /* ============ WORKER SCAN ============ */
-let scanStream=null, scanRAF=null;
+let scanStream=null, scanRAF=null, scanCanvas=null, scanCtx=null, scanBusy=false;
+ 
 function scanHTML(){
   return `
     <div class="scan-wrap">
       <div class="topline no-print" style="margin-bottom:14px"><div><div class="eyebrow">عامل</div><h2>مسح رمز الرولة</h2></div></div>
-      <div id="video-box"><video id="qr-video" playsinline muted></video><div class="scan-frame"></div></div>
+      <div id="video-box"><video id="qr-video" playsinline muted autoplay></video><div class="scan-frame"></div></div>
       <div class="row" style="margin-top:12px">
         <button class="btn primary" id="start-cam" style="flex:1">📷 تشغيل الكاميرا</button>
         <button class="btn ghost" id="stop-cam">إيقاف</button>
@@ -695,45 +696,118 @@ function scanHTML(){
     </div>
   `;
 }
-async function startCamera(){
-  const video = document.getElementById('qr-video');
-  try{
-    scanStream = await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:{ ideal:'environment' },
-        width:{ ideal:1920 },
-        height:{ ideal:1920 },
-        advanced:[{ focusMode:'continuous' }]
-      }
-    });
-    video.srcObject = scanStream;
-    await video.play();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const tick = ()=>{
-      if(video.readyState === video.HAVE_ENOUGH_DATA){
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        ctx.drawImage(video,0,0,canvas.width,canvas.height);
-        const img = ctx.getImageData(0,0,canvas.width,canvas.height);
-        const code = jsQR(img.data, img.width, img.height);
-        if(code && code.data){
-          handleScannedId(code.data.trim());
-          return; // stop loop, handled
-        }
-      }
-      scanRAF = requestAnimationFrame(tick);
-    };
-    scanRAF = requestAnimationFrame(tick);
-  }catch(e){
-    document.getElementById('scan-result').innerHTML = `<div class="scan-result">تعذّر الوصول للكاميرا. جرّب إدخال رقم الرولة يدوياً بالأسفل.</div>`;
+ 
+// Ordered from best to most compatible — each is only a *preference* (ideal),
+// so the browser silently falls back within one call; we only move to the next
+// entry if getUserMedia itself throws (e.g. the device truly can't satisfy it).
+const CAMERA_CONSTRAINT_ATTEMPTS = [
+  { video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1920 }, advanced:[{ focusMode:'continuous' }] } },
+  { video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1280 }, height:{ ideal:1280 } } },
+  { video:{ facingMode:'environment' } },
+  { video:true },
+];
+ 
+function cameraErrorMessage(err){
+  switch(err && err.name){
+    case 'NotAllowedError':
+    case 'PermissionDeniedError':
+      return 'تم رفض إذن الكاميرا. افتح إعدادات الموقع بالمتصفح وفعّل صلاحية الكاميرا، وأعد المحاولة.';
+    case 'NotFoundError':
+    case 'DevicesNotFoundError':
+      return 'ما اكو كاميرا متوفرة على هذا الجهاز أو المتصفح.';
+    case 'NotReadableError':
+    case 'TrackStartError':
+      return 'الكاميرا مستخدمة حاليًا من تطبيق أو تبويب ثاني. سكّرهم وأعد المحاولة.';
+    case 'OverconstrainedError':
+      return 'إعدادات الكاميرا المطلوبة غير مدعومة بهذا الجهاز.';
+    default:
+      return 'تعذّر الوصول للكاميرا.';
   }
 }
+ 
+async function startCamera(){
+  stopCamera(); // guarantee no leftover stream/loop before starting a new one
+  const video = document.getElementById('qr-video');
+  const statusBox = document.getElementById('scan-result');
+  statusBox.innerHTML = `<div class="scan-result" style="color:var(--ink-soft)">جاري تشغيل الكاميرا…</div>`;
+ 
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    statusBox.innerHTML = `<div class="scan-result" style="border-color:var(--red)">هذا المتصفح لا يدعم الوصول للكاميرا. جرّب متصفح Safari أو Chrome محدّث، أو استخدم الإدخال اليدوي بالأسفل.</div>`;
+    return;
+  }
+ 
+  let lastErr = null;
+  for(const constraints of CAMERA_CONSTRAINT_ATTEMPTS){
+    try{
+      scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+      lastErr = null;
+      break;
+    }catch(e){ lastErr = e; scanStream = null; }
+  }
+ 
+  if(!scanStream){
+    statusBox.innerHTML = `<div class="scan-result" style="border-color:var(--red)">${cameraErrorMessage(lastErr)} جرّب إدخال رقم الرولة يدويًا بالأسفل.</div>`;
+    return;
+  }
+ 
+  video.srcObject = scanStream;
+  try{ await video.play(); }catch(e){ /* some browsers auto-play once metadata is ready; ignore */ }
+ 
+  // Wait until the video actually has decodable frame dimensions before we start reading it —
+  // starting too early is a common reason scanning "does nothing" on slower devices.
+  await new Promise(resolve=>{
+    if(video.readyState >= 2 && video.videoWidth > 0) return resolve();
+    const onReady = ()=>{ video.removeEventListener('loadedmetadata', onReady); resolve(); };
+    video.addEventListener('loadedmetadata', onReady, { once:true });
+    setTimeout(resolve, 2000); // safety timeout, never hang the UI indefinitely
+  });
+ 
+  scanCanvas = document.createElement('canvas');
+  scanCtx = scanCanvas.getContext('2d', { willReadFrequently:true });
+  statusBox.innerHTML = '';
+  scanBusy = false;
+  scanRAF = requestAnimationFrame(tickScan);
+}
+ 
+function tickScan(){
+  const video = document.getElementById('qr-video');
+  if(!video || !scanStream){ return; } // camera was stopped mid-loop
+ 
+  if(video.readyState === video.HAVE_ENOUGH_DATA && !scanBusy && video.videoWidth > 0){
+    scanBusy = true;
+    try{
+      // Cap the analysis resolution: keeps decoding fast and battery-friendly
+      // while still far above what jsQR needs (native camera res is already high
+      // thanks to the constraints requested in startCamera).
+      const MAX_DIM = 1000;
+      const scale = Math.min(1, MAX_DIM / Math.max(video.videoWidth, video.videoHeight));
+      const w = Math.max(1, Math.round(video.videoWidth * scale));
+      const h = Math.max(1, Math.round(video.videoHeight * scale));
+      if(scanCanvas.width !== w) scanCanvas.width = w;
+      if(scanCanvas.height !== h) scanCanvas.height = h;
+      scanCtx.drawImage(video, 0, 0, w, h);
+      const img = scanCtx.getImageData(0, 0, w, h);
+      const code = jsQR(img.data, img.width, img.height, { inversionAttempts:'attemptBoth' });
+      if(code && code.data){
+        handleScannedId(code.data.trim());
+        return; // handleScannedId stops the camera; don't schedule another frame
+      }
+    }catch(e){
+      console.error('QR decode error', e);
+    }
+    scanBusy = false;
+  }
+  scanRAF = requestAnimationFrame(tickScan);
+}
+ 
 function stopCamera(){
   if(scanRAF) cancelAnimationFrame(scanRAF);
   if(scanStream) scanStream.getTracks().forEach(t=>t.stop());
-  scanStream=null; scanRAF=null;
+  scanStream = null; scanRAF = null; scanBusy = false;
+  const video = document.getElementById('qr-video');
+  if(video) video.srcObject = null;
 }
-
+ 
 async function handleScannedId(rollId){
   stopCamera();
   const roll = STATE.rolls.find(r=>r.id===rollId);
@@ -773,7 +847,7 @@ async function handleScannedId(rollId){
     box.innerHTML = `<div class="scan-result" style="color:var(--ink-soft)">هذه الرولة منتهية مسبقاً (بتاريخ ${new Date(roll.finishedAt).toLocaleDateString('ar-IQ')})</div>`;
   }
 }
-
+ 
 /* ============ TAB EVENTS ============ */
 function attachTabEvents(){
   if(STATE.tab==='inventory'){
@@ -811,7 +885,7 @@ function attachTabEvents(){
         };
       };
     });
-
+ 
     document.querySelectorAll('[data-delete-size]').forEach(btn=>{
       btn.onclick = async ()=>{
         const size = sizeById(btn.dataset.deleteSize);
@@ -828,7 +902,7 @@ function attachTabEvents(){
         render();
       };
     });
-
+ 
     document.querySelectorAll('[data-view-qr-size]').forEach(btn=>{
       btn.onclick = ()=>{
         const sizeId = btn.dataset.viewQrSize;
@@ -840,7 +914,7 @@ function attachTabEvents(){
         document.getElementById('qr-print-zone').scrollIntoView({behavior:'smooth', block:'start'});
       };
     });
-
+ 
     document.querySelectorAll('[data-delete-batch-size]').forEach(btn=>{
       btn.onclick = async ()=>{
         const sizeId = btn.dataset.deleteBatchSize;
@@ -890,7 +964,7 @@ function attachTabEvents(){
     };
   }
 }
-
+ 
 boot();
 </script>
 </body>
