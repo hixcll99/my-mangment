@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تركيبة | نظام مخزون الرولات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --panel:#FFFFFF;
+    --ink:#22262B;
+    --ink-soft:#5B6169;
+    --line:#E4DFD3;
+    --amber:#DE9A34;
+    --amber-deep:#B87A1F;
+    --teal:#2F6F5B;
+    --teal-soft:#E4EFE9;
+    --warn:#B87A1F;
+    --warn-soft:#FBEED8;
+    --red:#B8483C;
+    --red-soft:#F7E6E3;
+    --spool:#3B4450;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Tajawal',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ---------- Gate screen ---------- */
+  .gate{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 38px, var(--line) 38px 39px),
+      var(--paper);
+  }
+  .gate-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:4px;
+    padding:40px 36px; width:100%; max-width:420px; text-align:center;
+    box-shadow:0 1px 0 var(--line), 0 12px 30px -18px rgba(34,38,43,.35);
+  }
+  .gate-card .spool-mark{
+    width:56px;height:56px;margin:0 auto 18px;border-radius:50%;
+    background:var(--spool);position:relative;
+  }
+  .gate-card .spool-mark::after{
+    content:"";position:absolute;inset:16px;border-radius:50%;background:var(--paper);
+  }
+  .gate-card h1{font-size:22px;margin:0 0 6px;font-weight:900;}
+  .gate-card p{color:var(--ink-soft);font-size:14px;margin:0 0 28px;}
+  .role-btns{display:flex;flex-direction:column;gap:10px;}
+  .role-btn{
+    padding:16px; border-radius:4px; border:1px solid var(--line); background:var(--paper);
+    font-family:inherit; font-size:16px; font-weight:700; cursor:pointer; color:var(--ink);
+    transition:.15s;
+  }
+  .role-btn:hover{border-color:var(--amber-deep); background:#FBF0DE;}
+  .role-btn small{display:block;font-weight:400;font-size:12px;color:var(--ink-soft);margin-top:3px;}
+  .pin-box{margin-top:18px;display:none;}
+  .pin-box input{
+    width:100%;padding:12px;border:1px solid var(--line);border-radius:4px;font-family:'IBM Plex Mono',monospace;
+    font-size:18px;text-align:center;letter-spacing:6px;
+  }
+  .pin-box button{margin-top:10px;width:100%;padding:12px;border:none;border-radius:4px;background:var(--spool);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;}
+  .pin-err{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+
+  /* ---------- Shell ---------- */
+  .shell{display:flex;min-height:100vh;}
+  nav.side{
+    width:220px;flex:0 0 220px;background:var(--spool);color:#EFEAE0;
+    display:flex;flex-direction:column;padding:22px 14px;gap:2px;
+  }
+  nav.side .brand{padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:16px;}
+  nav.side .brand b{display:block;font-size:16px;font-weight:900;}
+  nav.side .brand span{font-size:11px;color:#B9C0C9;font-family:'IBM Plex Mono',monospace;}
+  nav.side button{
+    text-align:right;background:transparent;border:none;color:#DDE2E7;padding:11px 12px;border-radius:4px;
+    font-family:inherit;font-size:14.5px;font-weight:500;cursor:pointer;display:flex;justify-content:space-between;
+  }
+  nav.side button.active{background:var(--amber);color:#221800;font-weight:700;}
+  nav.side button:hover:not(.active){background:rgba(255,255,255,.08);}
+  nav.side .exit{margin-top:auto;color:#B9C0C9;font-size:12px;padding:10px 12px;cursor:pointer;}
+
+  main{flex:1;padding:28px 34px;max-width:1180px;}
+  .topline{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:22px;}
+  .topline h2{font-size:22px;margin:0;font-weight:900;}
+  .topline .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber-deep);text-transform:uppercase;letter-spacing:1px;}
+
+  .grid{display:grid;gap:16px;}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:1fr;} .g2{grid-template-columns:1fr;}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 20px;}
+  .stat{padding:18px 20px;}
+  .stat .label{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;}
+  .stat .sub{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+
+  h3.section{font-size:14px;margin:26px 0 10px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:right;color:var(--ink-soft);font-weight:600;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700;}
+  .tag.stock{background:var(--teal-soft);color:var(--teal);}
+  .tag.use{background:var(--warn-soft);color:var(--warn);}
+  .tag.done{background:#EFEFEF;color:#7A7F86;}
+  .tag.alert{background:var(--red-soft);color:var(--red);}
+
+  .btn{padding:9px 16px;border-radius:4px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);}
+  .btn.primary{background:var(--spool);color:#fff;border-color:var(--spool);}
+  .btn.amber{background:var(--amber);color:#221800;border-color:var(--amber);}
+  .btn.ghost{background:transparent;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  label.field{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
+  input,select{padding:9px 10px;border:1px solid var(--line);border-radius:4px;font-family:inherit;font-size:14px;width:100%;}
+
+  .bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px;}
+  .bar > div{height:100%;background:var(--amber);}
+
+  /* QR print tags */
+  .tags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;direction:ltr;}
+  .tag-card{
+    border:2px solid #111; border-radius:2px; text-align:center;
+    background:#fff; direction:ltr; break-inside:avoid; overflow:hidden;
+  }
+  .tag-card .qr-holder{display:flex;justify-content:center;padding:9px 9px 7px;}
+  .tag-card .tdim{
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px;letter-spacing:.3px;
+    border-top:2px solid #111;padding:7px 4px;background:#fff;
+  }
+  .tag-card .tmeta-row{display:flex;border-top:2px solid #111;}
+  .tag-card .tmeta-cell{flex:1;padding:6px 4px;}
+  .tag-card .tmeta-cell + .tmeta-cell{border-right:1px solid #111;}
+  .tag-card .tlabel{display:block;font-size:9px;letter-spacing:1px;color:#666;text-transform:uppercase;margin-bottom:2px;}
+  .tag-card .tval{display:block;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;}
+  .tag-card .tid{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#666;border-top:1px solid #111;padding:5px 4px;letter-spacing:.5px;}
+
+  /* Worker scan view */
+  .scan-wrap{max-width:480px;margin:0 auto;}
+  #video-box{position:relative;border-radius:6px;overflow:hidden;background:#000;aspect-ratio:1/1;}
+  #video-box video{width:100%;height:100%;object-fit:cover;}
+  .scan-frame{position:absolute;inset:14%;border:3px solid var(--amber);border-radius:8px;pointer-events:none;}
+  .scan-result{margin-top:16px;padding:16px;border-radius:4px;border:1px solid var(--line);background:var(--panel);}
+  .empty{color:var(--ink-soft);font-size:13px;padding:20px 0;text-align:center;}
+
+  .no-print{}
+  @media print{
+    @page{ size:A4; margin:12mm; }
+    .no-print{display:none !important;}
+    body{background:#fff;}
+    main{padding:0;max-width:none;}
+    .shell{display:block;}
+    .tags-grid{grid-template-columns:repeat(3,1fr) !important;gap:6mm !important;}
+    .tag-card .qr-holder canvas, .tag-card .qr-holder img{width:40mm !important;height:40mm !important;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ STORAGE HELPERS ============ */
+const KEYS = { sizes:'inv:sizes', rolls:'inv:rolls', settings:'inv:settings' };
+const DEFAULT_SETTINGS = { commDays:2, mfgDays:10, seaDays:20, localDays:4, safety:1.25, pin:'1234' };
+
+async function storeGet(key, fallback){
+  try{
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : fallback;
+  }catch(e){ return fallback; }
+}
+async function storeSet(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); }catch(e){ console.error('storage set failed', e); }
+}
+
+let STATE = { sizes:[], rolls:[], settings:DEFAULT_SETTINGS, role:null, tab:'dashboard' };
+
+async function loadAll(){
+  STATE.sizes = await storeGet(KEYS.sizes, []);
+  STATE.rolls = await storeGet(KEYS.rolls, []);
+  STATE.settings = await storeGet(KEYS.settings, DEFAULT_SETTINGS);
+}
+
+/* ============ HELPERS ============ */
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function fmt(n){ return new Intl.NumberFormat('en-US').format(Math.round(n*10)/10); }
+function daysBetween(a,b){ return Math.max(0, Math.round((b-a)/86400000)); }
+function sizeById(id){ return STATE.sizes.find(s=>s.id===id); }
+function sizeLabel(s){ return `${s.widthCm} سم × ${s.lengthM} م`; }
+function makeSizeCode(widthCm,lengthM){ return `W${widthCm}L${lengthM}`; }
+
+function rollsForSize(sizeId, status){
+  return STATE.rolls.filter(r=>r.sizeId===sizeId && (!status || r.status===status));
+}
+function countStock(sizeId){ return rollsForSize(sizeId,'in_stock').length; }
+function countUse(sizeId){ return rollsForSize(sizeId,'in_use').length; }
+
+function dailyConsumptionMeters(sizeId, windowDays){
+  const cutoff = Date.now() - windowDays*86400000;
+  const finished = STATE.rolls.filter(r=>r.sizeId===sizeId && r.status==='finished' && r.finishedAt>=cutoff);
+  const size = sizeById(sizeId);
+  if(!size) return 0;
+  const meters = finished.length * size.lengthM;
+  return meters / windowDays;
+}
+
+function leadTimeTotalDays(){
+  const s = STATE.settings;
+  return (Number(s.commDays)||0)+(Number(s.mfgDays)||0)+(Number(s.seaDays)||0)+(Number(s.localDays)||0);
+}
+
+function reorderInfo(sizeId){
+  const size = sizeById(sizeId);
+  const rate = dailyConsumptionMeters(sizeId, 30); // meters/day, last 30d
+  const lead = leadTimeTotalDays();
+  const safety = Number(STATE.settings.safety)||1;
+  const reorderPointMeters = rate * lead * safety;
+  const stockMeters = countStock(sizeId) * size.lengthM;
+  const needsReorder = rate > 0 ? stockMeters < reorderPointMeters : false;
+  const suggestedRolls = size.lengthM>0 ? Math.ceil(reorderPointMeters/size.lengthM) : 0;
+  return { rate, reorderPointMeters, stockMeters, needsReorder, suggestedRolls };
+}
+
+/* ============ RENDER ROOT ============ */
+async function boot(){
+  await loadAll();
+  render();
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(!STATE.role){ app.innerHTML = gateHTML(); attachGateEvents(); return; }
+  app.innerHTML = shellHTML();
+  attachShellEvents();
+  renderTab();
+}
+
+/* ============ GATE ============ */
+function gateHTML(){
+  return `
+  <div class="gate">
+    <div class="gate-card">
+      <div class="spool-mark"></div>
+      <h1>تركيبة</h1>
+      <p>نظام مخزون الرولات — اختر صفتك للدخول</p>
+      <div class="role-btns">
+        <button class="role-btn" id="btn-owner">المالك<small>إدارة كاملة، مخزون، تقارير، إعدادات</small></button>
+        <button class="role-btn" id="btn-worker">عامل<small>مسح QR فقط — بدء/إنهاء رولة</small></button>
+      </div>
+      <div class="pin-box" id="pin-box">
+        <label class="field">أدخل الرمز السري (افتراضي 1234)</label>
+        <input id="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="••••">
+        <button id="pin-go">دخول</button>
+        <div class="pin-err" id="pin-err">رمز غير صحيح</div>
+      </div>
+    </div>
+  </div>`;
+}
+function attachGateEvents(){
+  document.getElementById('btn-owner').onclick = ()=>{
+    document.getElementById('pin-box').style.display='block';
+    document.getElementById('pin-input').focus();
+  };
+  document.getElementById('btn-worker').onclick = ()=>{ STATE.role='worker'; STATE.tab='scan'; render(); };
+  document.getElementById('pin-go').onclick = checkPin;
+  document.getElementById('pin-input').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+}
+function checkPin(){
+  const val = document.getElementById('pin-input').value;
+  if(val === (STATE.settings.pin || DEFAULT_SETTINGS.pin)){
+    STATE.role='owner'; STATE.tab='dashboard'; render();
+  }else{
+    document.getElementById('pin-err').style.display='block';
+  }
+}
+
+/* ============ SHELL ============ */
+const OWNER_TABS = [
+  ['dashboard','لوحة التحكم'],
+  ['inventory','المخزون والقياسات'],
+  ['active','الرولات الشغالة'],
+  ['reports','التقارير'],
+  ['settings','الإعدادات'],
+];
+function shellHTML(){
+  const tabs = STATE.role==='owner' ? OWNER_TABS : [['scan','مسح QR']];
+  const navBtns = tabs.map(([id,label])=>`<button data-tab="${id}" class="${STATE.tab===id?'active':''}">${label}</button>`).join('');
+  return `
+  <div class="shell">
+    <nav class="side no-print">
+      <div class="brand"><b>تركيبة</b><span>ROLL-INV / ${STATE.role==='owner'?'المالك':'عامل'}</span></div>
+      ${navBtns}
+      <div class="exit" id="exit-btn">↩ تسجيل خروج</div>
+    </nav>
+    <main id="main-area"></main>
+  </div>`;
+}
+function attachShellEvents(){
+  document.querySelectorAll('nav.side button[data-tab]').forEach(b=>{
+    b.onclick = ()=>{ STATE.tab=b.dataset.tab; render(); };
+  });
+  document.getElementById('exit-btn').onclick = ()=>{ STATE.role=null; render(); };
+}
+
+function renderTab(){
+  const el = document.getElementById('main-area');
+  if(STATE.tab==='dashboard') el.innerHTML = dashboardHTML();
+  else if(STATE.tab==='inventory') el.innerHTML = inventoryHTML();
+  else if(STATE.tab==='active') el.innerHTML = activeHTML();
+  else if(STATE.tab==='reports') el.innerHTML = reportsHTML();
+  else if(STATE.tab==='settings') el.innerHTML = settingsHTML();
+  else if(STATE.tab==='scan') el.innerHTML = scanHTML();
+  attachTabEvents();
+}
+
+/* ============ DASHBOARD ============ */
+function dashboardHTML(){
+  const totalStockRolls = STATE.rolls.filter(r=>r.status==='in_stock').length;
+  const totalStockMeters = STATE.sizes.reduce((sum,s)=> sum + countStock(s.id)*s.lengthM, 0);
+  const totalInUse = STATE.rolls.filter(r=>r.status==='in_use').length;
+  const finished30 = STATE.rolls.filter(r=>r.status==='finished' && r.finishedAt >= Date.now()-30*86400000);
+  const consumedMeters30 = finished30.reduce((sum,r)=>{ const s=sizeById(r.sizeId); return sum + (s?s.lengthM:0); },0);
+
+  const alerts = STATE.sizes.map(s=>({s, info:reorderInfo(s.id)})).filter(x=>x.info.needsReorder);
+
+  const rowsBySize = STATE.sizes.map(s=>{
+    const info = reorderInfo(s.id);
+    const finishedThisSize30 = rollsForSize(s.id,'finished').filter(r=>r.finishedAt>=Date.now()-30*86400000).length;
+    return `<tr>
+      <td>${sizeLabel(s)} <span class="mono" style="color:var(--ink-soft);font-size:11px">(${s.code})</span></td>
+      <td>${countStock(s.id)} رولة <span style="color:var(--ink-soft)">(${fmt(countStock(s.id)*s.lengthM)} م)</span></td>
+      <td>${countUse(s.id)}</td>
+      <td>${finishedThisSize30} رولة <span style="color:var(--ink-soft)">(${fmt(finishedThisSize30*s.lengthM)} م)</span></td>
+      <td>${fmt(info.rate)} م/يوم</td>
+      <td>${info.needsReorder ? `<span class="tag alert">أعد الطلب — ${info.suggestedRolls} رولة</span>` : `<span class="tag stock">مخزون كافٍ</span>`}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty">لا توجد قياسات مضافة بعد — أضفها من تبويب "المخزون والقياسات"</td></tr>`;
+
+  return `
+    <div class="topline"><div><div class="eyebrow">نظرة عامة</div><h2>لوحة التحكم</h2></div></div>
+    <div class="grid g4">
+      <div class="card stat"><div class="label">رولات بالمخزن</div><div class="num">${totalStockRolls}</div><div class="sub">${fmt(totalStockMeters)} متر إجمالاً</div></div>
+      <div class="card stat"><div class="label">رولات شغالة على الستاند</div><div class="num">${totalInUse}</div><div class="sub">حالياً قيد الاستخدام</div></div>
+      <div class="card stat"><div class="label">عدد الرولات المصروفة (30 يوم)</div><div class="num">${finished30.length}</div><div class="sub">رولة كاملة انتهت</div></div>
+      <div class="card stat"><div class="label">الأمتار المصروفة (30 يوم)</div><div class="num">${fmt(consumedMeters30)}</div><div class="sub">متر</div></div>
+    </div>
+    <div class="grid g4" style="margin-top:16px">
+      <div class="card stat"><div class="label">تنبيهات إعادة طلب</div><div class="num" style="color:${alerts.length?'var(--red)':'var(--teal)'}">${alerts.length}</div><div class="sub">حسب مدة التوريد المحددة</div></div>
+    </div>
+
+    ${alerts.length ? `
+    <h3 class="section">تنبيهات نقص المخزون</h3>
+    <div class="grid g3">
+      ${alerts.map(a=>`
+        <div class="card" style="border-color:var(--red);background:var(--red-soft)">
+          <div style="font-weight:700">${sizeLabel(a.s)}</div>
+          <div style="font-size:12.5px;color:var(--ink-soft);margin-top:4px">المخزون الحالي ${fmt(a.info.stockMeters)} م، والمطلوب طلب ${a.info.suggestedRolls} رولة تقريباً بناءً على معدل الصرف ومدة التوريد (${leadTimeTotalDays()} يوم)</div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <h3 class="section">المخزون حسب القياس</h3>
+    <div class="card">
+      <table>
+        <tr><th>القياس</th><th>بالمخزن</th><th>شغالة</th><th>مصروف (30 يوم)</th><th>معدل الصرف</th><th>الحالة</th></tr>
+        ${rowsBySize}
+      </table>
+    </div>
+  `;
+}
+
+/* ============ INVENTORY (sizes + receive rolls + print QR) ============ */
+function inventoryHTML(){
+  const sizeRows = STATE.sizes.map(s=>`
+    <tr>
+      <td class="mono">${s.code}</td>
+      <td>${sizeLabel(s)}</td>
+      <td>${countStock(s.id)}</td>
+      <td>${countUse(s.id)}</td>
+      <td>${rollsForSize(s.id,'finished').length}</td>
+      <td class="row" style="gap:6px;flex-wrap:nowrap">
+        <button class="btn ghost" data-receive="${s.id}">استلام رولات</button>
+        <button class="btn ghost" data-delete-size="${s.id}" style="color:var(--red);border-color:var(--red-soft)">حذف</button>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="6" class="empty">لا توجد قياسات بعد</td></tr>`;
+
+  return `
+    <div class="no-print">
+      <div class="topline"><div><div class="eyebrow">إدارة</div><h2>المخزون والقياسات</h2></div></div>
+
+      <div class="card">
+        <div class="row">
+          <div style="flex:1"><label class="field">عرض الرولة (سم)</label><input id="new-width" type="number" placeholder="مثال: 50"></div>
+          <div style="flex:1"><label class="field">طول الرولة (متر)</label><input id="new-length" type="number" placeholder="مثال: 20"></div>
+          <div><button class="btn primary" id="add-size-btn" style="margin-top:19px">+ إضافة قياس جديد</button></div>
+        </div>
+      </div>
+
+      <h3 class="section">القياسات المسجلة</h3>
+      <div class="card">
+        <table>
+          <tr><th>الكود</th><th>القياس</th><th>بالمخزن</th><th>شغالة</th><th>منفذة</th><th></th></tr>
+          ${sizeRows}
+        </table>
+      </div>
+
+      <h3 class="section">سجل الاستلام</h3>
+      <div class="card">
+        <table>
+          <tr><th>تاريخ الإضافة للنظام</th><th>القياس</th><th>الكمية</th><th>نطاق الأكواد</th><th></th></tr>
+          ${receivingLogRows()}
+        </table>
+      </div>
+
+      <div id="receive-modal"></div>
+    </div>
+
+    <div id="qr-print-zone"></div>
+  `;
+}
+
+function receivingLogRows(){
+  // group rolls by (sizeId, receivedAt) — every roll of the same shipment shares the same receivedAt
+  const groups = {};
+  STATE.rolls.forEach(r=>{
+    const key = r.sizeId + '|' + r.receivedAt;
+    groups[key] = groups[key] || [];
+    groups[key].push(r);
+  });
+  const batches = Object.values(groups).sort((a,b)=> b[0].receivedAt - a[0].receivedAt);
+  if(!batches.length) return `<tr><td colspan="5" class="empty">لا يوجد سجل استلام بعد</td></tr>`;
+  return batches.map(list=>{
+    const s = sizeById(list[0].sizeId);
+    const dt = new Date(list[0].receivedAt);
+    const dateStr = dt.toLocaleDateString('ar-IQ') + ' — ' + dt.toLocaleTimeString('ar-IQ', {hour:'2-digit', minute:'2-digit'});
+    const sorted = [...list].sort((a,b)=>a.batchIndex-b.batchIndex);
+    const range = sorted.length>1 ? `${sorted[0].id} → ${sorted[sorted.length-1].id}` : sorted[0].id;
+    return `<tr>
+      <td>${dateStr}</td>
+      <td>${s?sizeLabel(s):'—'}</td>
+      <td>${list.length} رولة</td>
+      <td class="mono" style="font-size:12px">${range}</td>
+      <td class="row" style="gap:6px;flex-wrap:nowrap">
+        <button class="btn ghost" data-view-qr-size="${list[0].sizeId}" data-view-qr-time="${list[0].receivedAt}">عرض QR</button>
+        <button class="btn ghost" data-delete-batch-size="${list[0].sizeId}" data-delete-batch-time="${list[0].receivedAt}" style="color:var(--red);border-color:var(--red-soft)">حذف</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function receiveModalHTML(sizeId){
+  const s = sizeById(sizeId);
+  return `
+  <div class="card" style="margin-top:18px;border-color:var(--amber-deep)">
+    <div class="row" style="justify-content:space-between">
+      <div style="font-weight:700">استلام رولات جديدة — ${sizeLabel(s)}</div>
+      <button class="btn ghost" id="cancel-receive">إلغاء</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div style="flex:1"><label class="field">عدد الرولات المستلمة</label><input id="receive-count" type="number" min="1" placeholder="مثال: 5"></div>
+      <div><button class="btn amber" id="confirm-receive" style="margin-top:19px">تسجيل + توليد QR</button></div>
+    </div>
+  </div>`;
+}
+
+function generateQrTags(sizeId, roObjs){
+  const s = sizeById(sizeId);
+  const batchTotal = roObjs.length;
+  const zone = document.getElementById('qr-print-zone');
+
+  // one tag per roll (no duplicate copies)
+  const printList = roObjs.map(r=>({ r, c:0 }));
+
+  zone.innerHTML = `
+    <h3 class="section no-print">QR Tags — print and attach to each roll</h3>
+    <div class="row no-print" style="margin-bottom:10px"><button class="btn primary" id="print-tags-btn">🖶 Print / Save as PDF</button></div>
+    <div class="tags-grid" id="tags-grid">
+      ${printList.map(({r,c})=>`
+        <div class="tag-card">
+          <div class="qr-holder" id="qr-${r.id}-${c}"></div>
+          <div class="tdim">${s.widthCm}cm x ${s.lengthM}m</div>
+          <div class="tmeta-row">
+            <div class="tmeta-cell"><span class="tlabel">Roll</span><span class="tval">${String(r.batchIndex).padStart(3,'0')}</span></div>
+            <div class="tmeta-cell"><span class="tlabel">Of</span><span class="tval">${String(batchTotal).padStart(3,'0')}</span></div>
+          </div>
+          <div class="tid">${r.id}</div>
+        </div>`).join('')}
+    </div>`;
+  printList.forEach(({r,c})=>{
+    new QRCode(document.getElementById(`qr-${r.id}-${c}`), { text:r.id, width:130, height:130, correctLevel: QRCode.CorrectLevel.M });
+  });
+  document.getElementById('print-tags-btn').onclick = ()=> window.print();
+}
+
+/* ============ ACTIVE ROLLS ============ */
+function activeHTML(){
+  const active = STATE.rolls.filter(r=>r.status==='in_use').sort((a,b)=>a.startedAt-b.startedAt);
+  const rows = active.map(r=>{
+    const s = sizeById(r.sizeId);
+    const d = daysBetween(r.startedAt, Date.now());
+    return `<tr>
+      <td class="mono">${r.id}</td>
+      <td>${s?sizeLabel(s):'—'}</td>
+      <td>${new Date(r.receivedAt).toLocaleDateString('ar-IQ')}</td>
+      <td>${new Date(r.startedAt).toLocaleDateString('ar-IQ')}</td>
+      <td>${d} يوم</td>
+      <td><span class="tag use">شغالة</span></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty">لا توجد رولات شغالة حالياً على الستاند</td></tr>`;
+
+  return `
+    <div class="topline"><div><div class="eyebrow">الستاند</div><h2>الرولات الشغالة الآن</h2></div></div>
+    <div class="card">
+      <table><tr><th>رقم الرولة</th><th>القياس</th><th>تاريخ الاستلام</th><th>تاريخ التركيب</th><th>عدد الأيام</th><th>الحالة</th></tr>${rows}</table>
+    </div>
+  `;
+}
+
+/* ============ REPORTS ============ */
+function reportsHTML(){
+  return `
+    <div class="topline no-print"><div><div class="eyebrow">تقارير</div><h2>تقرير الصرف</h2></div>
+      <div class="row">
+        <select id="report-period">
+          <option value="7">آخر أسبوع</option>
+          <option value="30">آخر شهر</option>
+        </select>
+        <button class="btn primary" id="print-report-btn">🖶 طباعة / حفظ PDF</button>
+      </div>
+    </div>
+    <div id="report-body"></div>
+  `;
+}
+function renderReportBody(days){
+  const cutoff = Date.now() - days*86400000;
+  const finished = STATE.rolls.filter(r=>r.status==='finished' && r.finishedAt>=cutoff);
+  const bySize = {};
+  finished.forEach(r=>{
+    bySize[r.sizeId] = bySize[r.sizeId] || [];
+    bySize[r.sizeId].push(r);
+  });
+  const totalMeters = finished.reduce((sum,r)=>{ const s=sizeById(r.sizeId); return sum+(s?s.lengthM:0); },0);
+
+  const rows = Object.keys(bySize).map(sizeId=>{
+    const s = sizeById(sizeId);
+    const list = bySize[sizeId];
+    const meters = list.length * s.lengthM;
+    const avgDays = Math.round(list.reduce((sum,r)=>sum+daysBetween(r.startedAt||r.finishedAt, r.finishedAt),0)/list.length);
+    return `<tr><td>${sizeLabel(s)}</td><td>${list.length} رولة</td><td>${fmt(meters)} م</td><td>${avgDays} يوم</td></tr>`;
+  }).join('') || `<tr><td colspan="4" class="empty">لا يوجد صرف مسجل خلال هذه الفترة</td></tr>`;
+
+  document.getElementById('report-body').innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-weight:900;font-size:16px">تقرير الصرف — ${days==7?'آخر 7 أيام':'آخر 30 يوم'}</div>
+      <div style="color:var(--ink-soft);font-size:12.5px">تاريخ الإصدار: ${new Date().toLocaleDateString('ar-IQ')}</div>
+    </div>
+    <div class="grid g3" style="margin-bottom:16px">
+      <div class="card stat"><div class="label">عدد الرولات المصروفة</div><div class="num">${finished.length}</div></div>
+      <div class="card stat"><div class="label">إجمالي الأمتار المصروفة</div><div class="num">${fmt(totalMeters)}</div></div>
+      <div class="card stat"><div class="label">عدد القياسات المصروفة</div><div class="num">${Object.keys(bySize).length}</div></div>
+    </div>
+    <div class="card">
+      <table><tr><th>القياس</th><th>عدد الرولات</th><th>الأمتار</th><th>متوسط أيام الرولة</th></tr>${rows}</table>
+    </div>
+  `;
+}
+
+/* ============ SETTINGS ============ */
+function settingsHTML(){
+  const s = STATE.settings;
+  return `
+    <div class="topline"><div><div class="eyebrow">إعدادات</div><h2>مدة التوريد والتنبيهات</h2></div></div>
+    <div class="card">
+      <div class="grid g2">
+        <div><label class="field">مدة التخاطب مع المورد (يوم)</label><input id="s-comm" type="number" value="${s.commDays}"></div>
+        <div><label class="field">مدة التصنيع (يوم)</label><input id="s-mfg" type="number" value="${s.mfgDays}"></div>
+        <div><label class="field">مدة الشحن البحري (يوم)</label><input id="s-sea" type="number" value="${s.seaDays}"></div>
+        <div><label class="field">مدة الشحن الداخلي (يوم)</label><input id="s-local" type="number" value="${s.localDays}"></div>
+        <div><label class="field">هامش أمان (مثال 1.25 = 25%)</label><input id="s-safety" type="number" step="0.05" value="${s.safety}"></div>
+      </div>
+      <div style="margin-top:14px;color:var(--ink-soft);font-size:12.5px">إجمالي مدة التوريد الحالية: <b class="mono" style="color:var(--ink)">${leadTimeTotalDays()} يوم</b></div>
+      <div class="row" style="margin-top:16px"><button class="btn primary" id="save-settings">حفظ الإعدادات</button></div>
+    </div>
+
+    <h3 class="section">الرمز السري لدخول المالك</h3>
+    <div class="card">
+      <div class="row">
+        <div style="flex:1"><label class="field">رمز جديد</label><input id="s-pin" type="text" maxlength="8" placeholder="${s.pin}"></div>
+        <div><button class="btn ghost ${''}" id="save-pin" style="margin-top:19px">تحديث الرمز</button></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ WORKER SCAN ============ */
+let scanStream=null, scanRAF=null;
+function scanHTML(){
+  return `
+    <div class="scan-wrap">
+      <div class="topline no-print" style="margin-bottom:14px"><div><div class="eyebrow">عامل</div><h2>مسح رمز الرولة</h2></div></div>
+      <div id="video-box"><video id="qr-video" playsinline muted></video><div class="scan-frame"></div></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="start-cam" style="flex:1">📷 تشغيل الكاميرا</button>
+        <button class="btn ghost" id="stop-cam">إيقاف</button>
+      </div>
+      <h3 class="section">أو أدخل رقم الرولة يدوياً</h3>
+      <div class="row">
+        <input id="manual-id" placeholder="مثال: W50L20-004" style="flex:1">
+        <button class="btn amber" id="manual-go">بحث</button>
+      </div>
+      <div id="scan-result"></div>
+    </div>
+  `;
+}
+async function startCamera(){
+  const video = document.getElementById('qr-video');
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
+    video.srcObject = scanStream;
+    await video.play();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const tick = ()=>{
+      if(video.readyState === video.HAVE_ENOUGH_DATA){
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+        const code = jsQR(img.data, img.width, img.height);
+        if(code && code.data){
+          handleScannedId(code.data.trim());
+          return; // stop loop, handled
+        }
+      }
+      scanRAF = requestAnimationFrame(tick);
+    };
+    scanRAF = requestAnimationFrame(tick);
+  }catch(e){
+    document.getElementById('scan-result').innerHTML = `<div class="scan-result">تعذّر الوصول للكاميرا. جرّب إدخال رقم الرولة يدوياً بالأسفل.</div>`;
+  }
+}
+function stopCamera(){
+  if(scanRAF) cancelAnimationFrame(scanRAF);
+  if(scanStream) scanStream.getTracks().forEach(t=>t.stop());
+  scanStream=null; scanRAF=null;
+}
+
+async function handleScannedId(rollId){
+  stopCamera();
+  const roll = STATE.rolls.find(r=>r.id===rollId);
+  const box = document.getElementById('scan-result');
+  if(!roll){
+    box.innerHTML = `<div class="scan-result" style="border-color:var(--red)">لا توجد رولة بهذا الرمز: <span class="mono">${rollId}</span></div>`;
+    return;
+  }
+  const s = sizeById(roll.sizeId);
+  if(roll.status==='in_stock'){
+    box.innerHTML = `
+      <div class="scan-result">
+        <div style="font-weight:700">${roll.id} — ${sizeLabel(s)}</div>
+        <div style="color:var(--ink-soft);font-size:13px;margin:6px 0 12px">هذه الرولة بالمخزن. هل تريد تسجيل بدء استخدامها الآن على الستاند؟</div>
+        <button class="btn amber" id="confirm-start">✔ بدء الاستخدام الآن</button>
+      </div>`;
+    document.getElementById('confirm-start').onclick = async ()=>{
+      roll.status='in_use'; roll.startedAt=Date.now();
+      await storeSet(KEYS.rolls, STATE.rolls);
+      box.innerHTML = `<div class="scan-result" style="border-color:var(--teal)">تم ✔ — بدأ استخدام الرولة ${roll.id}</div>`;
+    };
+  }else if(roll.status==='in_use'){
+    const d = daysBetween(roll.startedAt, Date.now());
+    box.innerHTML = `
+      <div class="scan-result">
+        <div style="font-weight:700">${roll.id} — ${sizeLabel(s)}</div>
+        <div style="color:var(--ink-soft);font-size:13px;margin:6px 0 12px">شغالة منذ ${d} يوم. هل انتهت الرولة الآن؟</div>
+        <button class="btn amber" id="confirm-finish">✔ تسجيل الانتهاء الآن</button>
+      </div>`;
+    document.getElementById('confirm-finish').onclick = async ()=>{
+      roll.status='finished'; roll.finishedAt=Date.now();
+      await storeSet(KEYS.rolls, STATE.rolls);
+      const finalDays = daysBetween(roll.startedAt, roll.finishedAt);
+      box.innerHTML = `<div class="scan-result" style="border-color:var(--teal)">تم ✔ — الرولة ${roll.id} طولت ${finalDays} يوم بالضبط</div>`;
+    };
+  }else{
+    box.innerHTML = `<div class="scan-result" style="color:var(--ink-soft)">هذه الرولة منتهية مسبقاً (بتاريخ ${new Date(roll.finishedAt).toLocaleDateString('ar-IQ')})</div>`;
+  }
+}
+
+/* ============ TAB EVENTS ============ */
+function attachTabEvents(){
+  if(STATE.tab==='inventory'){
+    document.getElementById('add-size-btn').onclick = async ()=>{
+      const w = Number(document.getElementById('new-width').value);
+      const l = Number(document.getElementById('new-length').value);
+      if(!w || !l){ alert('أدخل عرض وطول صحيحين'); return; }
+      const code = makeSizeCode(w,l);
+      if(STATE.sizes.some(s=>s.code===code)){ alert('هذا القياس موجود مسبقاً'); return; }
+      STATE.sizes.push({ id:uid(), widthCm:w, lengthM:l, code, nextSeq:1 });
+      await storeSet(KEYS.sizes, STATE.sizes);
+      render();
+    };
+    document.querySelectorAll('[data-receive]').forEach(btn=>{
+      btn.onclick = ()=>{
+        document.getElementById('receive-modal').innerHTML = receiveModalHTML(btn.dataset.receive);
+        document.getElementById('cancel-receive').onclick = ()=>{ document.getElementById('receive-modal').innerHTML=''; };
+        document.getElementById('confirm-receive').onclick = async ()=>{
+          const count = Number(document.getElementById('receive-count').value);
+          if(!count || count<1){ alert('أدخل عدد صحيح'); return; }
+          const size = sizeById(btn.dataset.receive);
+          const receivedAt = Date.now();
+          const newRolls = [];
+          for(let i=0;i<count;i++){
+            const seq = size.nextSeq++;
+            const roll = { id:`${size.code}-${String(seq).padStart(3,'0')}`, sizeId:size.id, status:'in_stock', receivedAt, batchIndex:i+1, batchTotal:count };
+            STATE.rolls.push(roll);
+            newRolls.push(roll);
+          }
+          await storeSet(KEYS.sizes, STATE.sizes);
+          await storeSet(KEYS.rolls, STATE.rolls);
+          renderTab(); // refresh table counts and clear the receive form
+          document.getElementById('receive-modal').innerHTML = `<div class="card" style="margin-top:18px;border-color:var(--teal)">تم تسجيل ${count} رولة بنجاح ✔</div>`;
+          generateQrTags(size.id, newRolls);
+        };
+      };
+    });
+
+    document.querySelectorAll('[data-delete-size]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const size = sizeById(btn.dataset.deleteSize);
+        if(!size) return;
+        const linkedRolls = STATE.rolls.filter(r=>r.sizeId===size.id).length;
+        const msg = linkedRolls>0
+          ? `هذا القياس (${sizeLabel(size)}) مرتبط فيه ${linkedRolls} رولة (بالمخزن أو شغالة أو منفذة). حذف القياس راح يحذف كل هذي الرولات وسجلاتها نهائياً. متأكد تريد المتابعة؟`
+          : `حذف القياس ${sizeLabel(size)} نهائياً؟`;
+        if(!confirm(msg)) return;
+        STATE.sizes = STATE.sizes.filter(s=>s.id!==size.id);
+        STATE.rolls = STATE.rolls.filter(r=>r.sizeId!==size.id);
+        await storeSet(KEYS.sizes, STATE.sizes);
+        await storeSet(KEYS.rolls, STATE.rolls);
+        render();
+      };
+    });
+
+    document.querySelectorAll('[data-view-qr-size]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const sizeId = btn.dataset.viewQrSize;
+        const receivedAt = Number(btn.dataset.viewQrTime);
+        const batchRolls = STATE.rolls.filter(r=>r.sizeId===sizeId && r.receivedAt===receivedAt)
+          .sort((a,b)=>a.batchIndex-b.batchIndex);
+        if(!batchRolls.length){ alert('ما لكيت رولات لهذه الشحنة'); return; }
+        generateQrTags(sizeId, batchRolls);
+        document.getElementById('qr-print-zone').scrollIntoView({behavior:'smooth', block:'start'});
+      };
+    });
+
+    document.querySelectorAll('[data-delete-batch-size]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const sizeId = btn.dataset.deleteBatchSize;
+        const receivedAt = Number(btn.dataset.deleteBatchTime);
+        const batchRolls = STATE.rolls.filter(r=>r.sizeId===sizeId && r.receivedAt===receivedAt);
+        const usedCount = batchRolls.filter(r=>r.status!=='in_stock').length;
+        const s = sizeById(sizeId);
+        let msg = `حذف هذه الشحنة (${batchRolls.length} رولة من ${s?sizeLabel(s):''}) نهائياً؟`;
+        if(usedCount>0) msg += `\n\nتنبيه: ${usedCount} من رولات هذه الشحنة شغالة أو منفذة حالياً — حذفها راح يفقد سجل استخدامها.`;
+        if(!confirm(msg)) return;
+        STATE.rolls = STATE.rolls.filter(r=>!(r.sizeId===sizeId && r.receivedAt===receivedAt));
+        await storeSet(KEYS.rolls, STATE.rolls);
+        render();
+      };
+    });
+  }
+  if(STATE.tab==='reports'){
+    const period = document.getElementById('report-period');
+    renderReportBody(Number(period.value));
+    period.onchange = ()=> renderReportBody(Number(period.value));
+    document.getElementById('print-report-btn').onclick = ()=> window.print();
+  }
+  if(STATE.tab==='settings'){
+    document.getElementById('save-settings').onclick = async ()=>{
+      STATE.settings.commDays = Number(document.getElementById('s-comm').value)||0;
+      STATE.settings.mfgDays = Number(document.getElementById('s-mfg').value)||0;
+      STATE.settings.seaDays = Number(document.getElementById('s-sea').value)||0;
+      STATE.settings.localDays = Number(document.getElementById('s-local').value)||0;
+      STATE.settings.safety = Number(document.getElementById('s-safety').value)||1;
+      await storeSet(KEYS.settings, STATE.settings);
+      renderTab();
+    };
+    document.getElementById('save-pin').onclick = async ()=>{
+      const val = document.getElementById('s-pin').value.trim();
+      if(val.length<4){ alert('استخدم رمز من 4 أرقام على الأقل'); return; }
+      STATE.settings.pin = val;
+      await storeSet(KEYS.settings, STATE.settings);
+      alert('تم تحديث الرمز');
+    };
+  }
+  if(STATE.tab==='scan'){
+    document.getElementById('start-cam').onclick = startCamera;
+    document.getElementById('stop-cam').onclick = stopCamera;
+    document.getElementById('manual-go').onclick = ()=>{
+      const v = document.getElementById('manual-id').value.trim();
+      if(v) handleScannedId(v);
+    };
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
