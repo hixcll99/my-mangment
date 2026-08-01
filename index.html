@@ -172,7 +172,7 @@
     border:2px solid #111; border-radius:2px; text-align:center;
     background:#fff; direction:ltr; break-inside:avoid; overflow:hidden;
   }
-  .tag-card .qr-holder{display:flex;justify-content:center;padding:9px 9px 7px;}
+  .tag-card .qr-holder{display:flex;justify-content:center;padding:14px 14px 10px;}
   .tag-card .tdim{
     font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px;letter-spacing:.3px;
     border-top:2px solid #111;padding:7px 4px;background:#fff;
@@ -200,7 +200,8 @@
     main{padding:0;max-width:none;}
     .shell{display:block;}
     .tags-grid{grid-template-columns:repeat(3,1fr) !important;gap:6mm !important;}
-    .tag-card .qr-holder canvas, .tag-card .qr-holder img{width:40mm !important;height:40mm !important;}
+    .tag-card .qr-holder{padding:5mm 5mm 3mm !important;}
+    .tag-card .qr-holder canvas, .tag-card .qr-holder img{width:34mm !important;height:34mm !important;}
   }
 </style>
 </head>
@@ -213,8 +214,6 @@
 // 2) Add a "Web app" to get this config object and paste it below
 // 3) Enable Firestore Database + enable Anonymous sign-in under Authentication
 // See the setup guide sent alongside this file for exact steps.
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC0SUgkxaSdjF4HPUtwmyCxsqvuWytnJxY",
   authDomain: "tarkiba-production2.firebaseapp.com",
@@ -224,7 +223,7 @@ const firebaseConfig = {
   appId: "1:330750429873:web:c3e339f9ac2f76504af090",
   measurementId: "G-VZVJHXDFD6"
 };
-  firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const COLLECTION = 'tarkiba_inventory';
 
