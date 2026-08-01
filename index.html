@@ -191,7 +191,7 @@ const firebaseConfig = {
   appId: "1:937387915006:web:1c4e091ffe8548f53b97af",
   measurementId: "G-KY3Z1E8F97"
 };
-firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const COLLECTION = 'tarkiba_inventory';
 
@@ -223,9 +223,14 @@ let STATE = { sizes:[], rolls:[], settings:DEFAULT_SETTINGS, role:null, tab:'das
 
 async function loadAll(){
   await ensureAuth();
-  STATE.sizes = await storeGet(KEYS.sizes, []);
-  STATE.rolls = await storeGet(KEYS.rolls, []);
-  STATE.settings = await storeGet(KEYS.settings, DEFAULT_SETTINGS);
+  const [sizes, rolls, settings] = await Promise.all([
+    storeGet(KEYS.sizes, []),
+    storeGet(KEYS.rolls, []),
+    storeGet(KEYS.settings, DEFAULT_SETTINGS),
+  ]);
+  STATE.sizes = sizes;
+  STATE.rolls = rolls;
+  STATE.settings = settings;
 }
 
 /* ============ HELPERS ============ */
