@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --paper:#F6F3EC;
@@ -173,23 +176,53 @@
 <div id="app"></div>
 
 <script>
-/* ============ STORAGE HELPERS ============ */
-const KEYS = { sizes:'inv:sizes', rolls:'inv:rolls', settings:'inv:settings' };
+/* ============ FIREBASE SETUP ============ */
+// 1) Create a free project at https://console.firebase.google.com
+// 2) Add a "Web app" to get this config object and paste it below
+// 3) Enable Firestore Database + enable Anonymous sign-in under Authentication
+// See the setup guide sent alongside this file for exact steps.
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBrdwZoXAKgnyTZm5ZSaYCgn2rpCgcfmGw",
+  authDomain: "tarkiba-inventory-id.firebaseapp.com",
+  projectId: "tarkiba-inventory-id",
+  storageBucket: "tarkiba-inventory-id.firebasestorage.app",
+  messagingSenderId: "937387915006",
+  appId: "1:937387915006:web:1c4e091ffe8548f53b97af",
+  measurementId: "G-KY3Z1E8F97"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = 'tarkiba_inventory';
+
+async function ensureAuth(){
+  return new Promise((resolve)=>{
+    firebase.auth().onAuthStateChanged(user=>{
+      if(user){ resolve(user); }
+      else{ firebase.auth().signInAnonymously().catch(err=>console.error('auth failed', err)); }
+    });
+  });
+}
+
+/* ============ STORAGE HELPERS (Firestore-backed) ============ */
+const KEYS = { sizes:'sizes', rolls:'rolls', settings:'settings' };
 const DEFAULT_SETTINGS = { commDays:2, mfgDays:10, seaDays:20, localDays:4, safety:1.25, pin:'1234' };
 
 async function storeGet(key, fallback){
   try{
-    const r = await window.storage.get(key, true);
-    return r ? JSON.parse(r.value) : fallback;
-  }catch(e){ return fallback; }
+    const snap = await db.collection(COLLECTION).doc(key).get();
+    return snap.exists ? snap.data().value : fallback;
+  }catch(e){ console.error('storage get failed', e); return fallback; }
 }
 async function storeSet(key, value){
-  try{ await window.storage.set(key, JSON.stringify(value), true); }catch(e){ console.error('storage set failed', e); }
+  try{ await db.collection(COLLECTION).doc(key).set({ value, updatedAt: Date.now() }); }
+  catch(e){ console.error('storage set failed', e); alert('تعذّر الحفظ — تأكد من اتصال الإنترنت وإعدادات Firebase'); }
 }
 
 let STATE = { sizes:[], rolls:[], settings:DEFAULT_SETTINGS, role:null, tab:'dashboard' };
 
 async function loadAll(){
+  await ensureAuth();
   STATE.sizes = await storeGet(KEYS.sizes, []);
   STATE.rolls = await storeGet(KEYS.rolls, []);
   STATE.settings = await storeGet(KEYS.settings, DEFAULT_SETTINGS);
